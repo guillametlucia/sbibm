@@ -1,5 +1,6 @@
 #from __future__ import annotations
 #import gc
+#check where to put repressilator in uppercase
 import math
 from pathlib import Path
 from typing import Callable, List, Optional
@@ -88,6 +89,18 @@ class Repressilator(Task):
         }
         self.prior_dist = pdist.LogNormal(**self.prior_params).to_event(1)
         self.prior_dist.set_default_validate_args(False)
+        
+        """this is on lotka
+          mu_p1 = -0.125
+        mu_p2 = -3.0
+        sigma_p = 0.5
+        self.prior_params = {
+            "loc": torch.tensor([mu_p1, mu_p2, mu_p1, mu_p2]),
+            "scale": torch.tensor([sigma_p, sigma_p, sigma_p, sigma_p]),
+        }
+        self.prior_dist = pdist.LogNormal(**self.prior_params).to_event(1)
+        self.prior_dist.set_default_validate_args(False)
+        """
 ##################
         self.u0 = torch.tensor([0,0,0,0,0,0])
         self.tspan = torch.tensor([0.0, days])
@@ -115,7 +128,10 @@ class Repressilator(Task):
 
     def get_labels_parameters(self) -> List[str]:
         """Get list containing parameter labels"""
-        return [r"$\beta$", r"$\gamma$"]
+        return [r"$n_tet$", r"$n_lac$", r"$n_lam$", r"$\alpha_tet$", 
+                r"$\alpha_lac$",r"$\alpha_lam$",r"$\alpha_0_tet$",
+               r"$\alpha_0_lac$",r"$\alpha_0_lam$",r"$\beta_tet$",
+               r"$\beta_lac$",r"$\beta_lam$",]
 
     def get_prior(self) -> Callable:
         def prior(num_samples=1):
@@ -143,7 +159,8 @@ class Repressilator(Task):
             for num_sample in range(num_samples):
                 u, t = self.de(self.u0, self.tspan, parameters[num_sample, :])
 
-                if u.shape != torch.Size([3, int(self.dim_data_raw / 3)]):
+                if u.shape != torch.Size([3, int(self.dim_data_raw / 3)]): #why is this 3. in lotka it is 2.
+                    #has to do with saveat
                     u = float("nan") * torch.ones((3, int(self.dim_data_raw / 3)))
                     u = u.double()
 
@@ -187,7 +204,7 @@ class Repressilator(Task):
     def unflatten_data(self, data: torch.Tensor) -> torch.Tensor:
         """Unflattens data into multiple observations"""
         if self.summary is None:
-            return data.reshape(-1, 3, int(self.dim_data / 3))
+            return data.reshape(-1, 3, int(self.dim_data / 3)) #the 3 again
         else:
             return data.reshape(-1, self.dim_data)
 
@@ -252,5 +269,5 @@ class Repressilator(Task):
 
 
 if __name__ == "__main__":
-    task = SIR()
+    task = Repressilator()
     task._setup()
