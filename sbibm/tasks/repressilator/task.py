@@ -1,6 +1,6 @@
-#from __future__ import annotations
-#import gc
-#check where to put repressilator in uppercase
+#from __future__ import annotations 
+
+#import gc ###about simulator 
 import math
 from pathlib import Path
 from typing import Callable, List, Optional
@@ -83,11 +83,13 @@ class Repressilator(Task):
         )
 ######################change
         # Prior 
-        self.prior_params = {
-            "loc": torch.tensor([math.log(0.4), math.log(0.125)]), # need to change to uniform prior
-            "scale": torch.tensor([0.5, 0.2]),
+    ##where do i put the logarithm
+    # value bounds in log already or not? and what values
+        self.prior_params = { #am i doing same values for all. if not do torch.tensor([param1,param2..])
+            "low": VALUE* torch.ones((self.dim_parameters,)), # need to change to uniform prior
+            "high": VALUE * torch.ones((self.dim_parameters,)),
         }
-        self.prior_dist = pdist.LogNormal(**self.prior_params).to_event(1)
+        self.prior_dist = pdist.Uniform(**self.prior_params).to_event(1) #whaat is this event thing
         self.prior_dist.set_default_validate_args(False)
         
         """this is on lotka
@@ -98,8 +100,7 @@ class Repressilator(Task):
             "loc": torch.tensor([mu_p1, mu_p2, mu_p1, mu_p2]),
             "scale": torch.tensor([sigma_p, sigma_p, sigma_p, sigma_p]),
         }
-        self.prior_dist = pdist.LogNormal(**self.prior_params).to_event(1)
-        self.prior_dist.set_default_validate_args(False)
+
         """
 ##################
         self.u0 = torch.tensor([0,0,0,0,0,0])
