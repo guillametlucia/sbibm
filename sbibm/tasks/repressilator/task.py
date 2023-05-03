@@ -18,12 +18,6 @@ from sbibm.utils.decorators import lazy_property
 class Repressilator(Task):
     def __init__(
         self,
-        m_tet: float = 0.0, #can choosse in middle of simulations
-        p_tet: float = 0.0,
-        m_lac: float = 0.0,
-        p_lac: float = 0.0,
-        m_lam: float = 0.0,
-        p_lam: float = 0.0,
         days: float = 160.0, #choose depending on simulations
         saveat: float = 1.0, #dont understand what this is
         total_count: int = 1000,#total count of waht. in klotka volterra alsothis value.
@@ -34,7 +28,8 @@ class Repressilator(Task):
         summary: Optional[str] = "subsample",
     ):
         """Repressilator synthetic genetic circuit
-        Inference is performed for twelve parameters:
+        Inference is performed for twelve parameters 
+        (these four for TetR, LacI and lambda CI):
         - Hill coefficient, n
         - Gene expression rate, alpha
         - Leaky expression, alpha_0
@@ -48,7 +43,7 @@ class Repressilator(Task):
         References:
             [1]: https://www.nature.com/articles/35002125
         """
-        self.dim_data_raw = int(3 * (days / saveat + 1))
+        self.dim_data_raw = int(3 * (days / saveat + 1)) #the 3 is a 2 in lotka volterra. why
 
         if summary is None:
             dim_data = self.dim_data_raw
@@ -63,7 +58,7 @@ class Repressilator(Task):
         observation_seeds = [
             1000000,  # observation 1
             1000001,  # observation 2
-            1000010,  # observation 3*
+            1000010,  # observation 3* #why the asterisk
             1000011,  # observation 4*
             1000004,  # observation 5
             1000005,  # observation 6
@@ -74,10 +69,10 @@ class Repressilator(Task):
         ]
 
         super().__init__(
-            dim_parameters=2,
+            dim_parameters=12,
             dim_data=dim_data,
             name=Path(__file__).parent.name,
-            name_display="SIR",
+            name_display="Repressilator",
             num_observations=10,
             num_posterior_samples=10000,
             num_reference_posterior_samples=10000,
@@ -85,32 +80,33 @@ class Repressilator(Task):
             path=Path(__file__).parent.absolute(),
             observation_seeds=observation_seeds,
         )
-
-        # Prior over beta and gamma
+######################change
+        # Prior 
         self.prior_params = {
-            "loc": torch.tensor([math.log(0.4), math.log(0.125)]),
+            "loc": torch.tensor([math.log(0.4), math.log(0.125)]), # need to change to uniform prior
             "scale": torch.tensor([0.5, 0.2]),
         }
         self.prior_dist = pdist.LogNormal(**self.prior_params).to_event(1)
         self.prior_dist.set_default_validate_args(False)
-
-        self.u0 = torch.tensor([N - I0 - R0, I0, R0])
+##################
+        self.u0 = torch.tensor([0,0,0,0,0,0])
         self.tspan = torch.tensor([0.0, days])
-
         self.days = days
         self.saveat = saveat
-        self.N = N
 
     @lazy_property
     def de(self):
         return DiffEq(
             f=f"""
             function f(du,u,p,t)
-                S,I,R = u
-                b,g = p
-                du[1] = -b * S * I / {self.N}
-                du[2] = b * S * I / {self.N} - g * I
-                du[3] = g * I
+                m_tet,p_tet,m_lac,p_lac,m_lam,p_lam = u
+                n_tet, n_lac, n_lam,a_tet,a_lac,a_lam,a_0_tet,a_0_lac,a_0_lam,b_tet,b_lac,b_lam = p
+                du[1] = -m_tet + (a_tet / (1 + p_lac ** n_lac)) + a_0_tet
+                du[2] = -b_tet*(p_tet-m_tet)
+                du[3] = -m_lac + (a_lac / (1 + p_lam ** n_lam)) + a_0_lac
+                du[4] = -b_lac*(p_lac-m_lac)
+                du[5] = -m_lam + (a_lam / (1 + p_tet ** n_tet)) + a_0_lam
+                du[6] = -b_lam*(p_lam-m_lam)
             end
             """,
             saveat=self.saveat,
