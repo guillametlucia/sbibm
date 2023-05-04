@@ -85,7 +85,7 @@ class Repressilator(Task):
         }
         log_uniform_dist = pdist.Uniform(**self.prior_params).to_event(1) 
         power_transform = PowerTransform(10.0)
-        self.prior_dist = dist.TransformedDistribution(log_uniform_dist, power_transform)
+        self.prior_dist = pdist.TransformedDistribution(log_uniform_dist, power_transform)
         self.prior_dist.set_default_validate_args(False)
 
         """this is on lotka
