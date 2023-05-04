@@ -22,11 +22,7 @@ class Repressilator(Task):
         self,
         days: float = 160.0, #choose depending on simulations
         saveat: float = 1.0, #dont understand what this is
-        total_count: int = 1000,#total count of waht. in klotka volterra alsothis value.
-     """
-          # NOTE: For subsample statistic
-        self.total_count = 1000  # TODO: Value?
-        """ 
+        total_count: int = 1000,#total count of waht. in klotka volterra alsothis value.something different there
         summary: Optional[str] = "subsample",
     ):
         """Repressilator synthetic genetic circuit
