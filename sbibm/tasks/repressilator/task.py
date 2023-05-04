@@ -9,6 +9,7 @@ import pyro
 import torch
 from diffeqtorch import DiffEq
 from pyro import distributions as pdist
+from pyro.distributions.transforms import PowerTransform
 
 import sbibm  # noqa -- needed for setting sysimage path
 from sbibm.tasks.simulator import Simulator
@@ -81,17 +82,16 @@ class Repressilator(Task):
             path=Path(__file__).parent.absolute(),
             observation_seeds=observation_seeds,
         )
-######################change
         # Prior 
-    ##where do i put the logarithm
-    # value bounds in log already or not? and what values
         self.prior_params = { #am i doing same values for all. if not do torch.tensor([param1,param2..])
-            "low": VALUE* torch.ones((self.dim_parameters,)), # need to change to uniform prior
-            "high": VALUE * torch.ones((self.dim_parameters,)),
+            "low": -10* torch.ones((self.dim_parameters,)), # value i set is random
+            "high": 10 * torch.ones((self.dim_parameters,)),
         }
-        self.prior_dist = pdist.Uniform(**self.prior_params).to_event(1) #whaat is this event thing
+        log_uniform_dist = pdist.Uniform(**self.prior_params).to_event(1) 
+        power_transform = PowerTransform(10.0)
+        self.prior_dist = dist.TransformedDistribution(log_uniform_dist, power_transform)
         self.prior_dist.set_default_validate_args(False)
-        
+
         """this is on lotka
           mu_p1 = -0.125
         mu_p2 = -3.0
@@ -102,7 +102,7 @@ class Repressilator(Task):
         }
 
         """
-##################
+
         self.u0 = torch.tensor([0,0,0,0,0,0])
         self.tspan = torch.tensor([0.0, days])
         self.days = days
