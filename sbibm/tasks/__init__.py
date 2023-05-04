@@ -17,6 +17,8 @@ def get_task(task_name: str, *args: Any, **kwargs: Any) -> Task:
         from sbibm.tasks.lotka_volterra.task import LotkaVolterra
 
         return LotkaVolterra(*args, **kwargs)
+    elif task_name == "repressilator":
+        from sbibm.tasks.repressilator.task import Repressilator
 
     elif task_name == "bernoulli_glm":
         from sbibm.tasks.bernoulli_glm.task import BernoulliGLM
