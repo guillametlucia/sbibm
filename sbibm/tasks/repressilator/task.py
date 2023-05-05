@@ -160,8 +160,8 @@ class Repressilator(Task):
                     u = float("nan") * torch.ones((6, int(self.dim_data_raw / 6)))
                     u = u.double()
 
-                us.append(u.reshape(1, 3, -1))
-            us = torch.cat(us).float()  # num_parameters x 3 x (days/saveat + 1)
+                us.append(u.reshape(1, 6, -1))
+            us = torch.cat(us).float()  # num_parameters x 6 x (days/saveat + 1)
 
             idx_contains_nan = torch.where(
                 torch.isnan(us.reshape(num_samples, -1)).any(axis=1)
