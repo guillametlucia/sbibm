@@ -41,7 +41,7 @@ class Repressilator(Task):
         References:
             [1]: https://www.nature.com/articles/35002125
         """
-        self.dim_data_raw = int(3 * (days / saveat + 1)) #the 3 is a 2 in lotka volterra. why
+        self.dim_data_raw = int(6 * (days / saveat + 1)) 
 
         if summary is None:
             dim_data = self.dim_data_raw
@@ -127,8 +127,8 @@ class Repressilator(Task):
         """Get list containing parameter labels"""
         return [r"$n_tet$", r"$n_lac$", r"$n_lam$", r"$\alpha_tet$", 
                 r"$\alpha_lac$",r"$\alpha_lam$",r"$\alpha_0_tet$",
-               r"$\alpha_0_lac$",r"$\alpha_0_lam$",r"$\beta_tet$",
-               r"$\beta_lac$",r"$\beta_lam$",]
+                r"$\alpha_0_lac$",r"$\alpha_0_lam$",r"$\beta_tet$",
+                r"$\beta_lac$",r"$\beta_lam$",]
 
     def get_prior(self) -> Callable:
         def prior(num_samples=1):
