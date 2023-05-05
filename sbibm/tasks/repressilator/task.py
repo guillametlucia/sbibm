@@ -156,9 +156,8 @@ class Repressilator(Task):
             for num_sample in range(num_samples):
                 u, t = self.de(self.u0, self.tspan, parameters[num_sample, :])
 
-                if u.shape != torch.Size([3, int(self.dim_data_raw / 3)]): #why is this 3. in lotka it is 2.
-                    #has to do with saveat
-                    u = float("nan") * torch.ones((3, int(self.dim_data_raw / 3)))
+                if u.shape != torch.Size([6, int(self.dim_data_raw / 6)]):  
+                    u = float("nan") * torch.ones((6, int(self.dim_data_raw / 6)))
                     u = u.double()
 
                 us.append(u.reshape(1, 3, -1))
