@@ -1,6 +1,6 @@
 from __future__ import annotations 
 
-import gc ###about simulator 
+import gc 
 import math
 from pathlib import Path
 from typing import Callable, List, Optional
@@ -20,9 +20,9 @@ from sbibm.utils.decorators import lazy_property
 class Repressilator(Task):
     def __init__(
         self,
-        days: float = 160.0, #choose depending on simulations
-        saveat: float = 1.0, #dont understand what this is
-        total_count: int = 1000,#total count of waht. in klotka volterra alsothis value.something different there
+        days: float = 20.0, 
+        saveat: float = 0.1, 
+        total_count: int = 1000,
         summary: Optional[str] = "subsample",
     ):
         """Repressilator synthetic genetic circuit
@@ -41,7 +41,7 @@ class Repressilator(Task):
         References:
             [1]: https://www.nature.com/articles/35002125
         """
-        self.dim_data_raw = int(6 * (days / saveat + 1)) 
+        self.dim_data_raw = int(6 * (days / saveat + 1)) #number of variables*(20/1.1)= 109.09
 
         if summary is None:
             dim_data = self.dim_data_raw
@@ -80,8 +80,8 @@ class Repressilator(Task):
         )
         # Prior 
         self.prior_params = { #am i doing same values for all. if not do torch.tensor([param1,param2..])
-            "low": -10* torch.ones((self.dim_parameters,)), # value i set is random
-            "high": 10 * torch.ones((self.dim_parameters,)),
+            "low": -1* torch.ones((self.dim_parameters,)), # value i set is random
+            "high": 1 * torch.ones((self.dim_parameters,)),
         }
         log_uniform_dist = pdist.Uniform(**self.prior_params).to_event(1) 
         power_transform = PowerTransform(10.0)
