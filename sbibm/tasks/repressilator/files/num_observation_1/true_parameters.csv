@@ -1,2 +1,2 @@
-parameter_1,parameter_2,parameter_3,parameter_4,parameter_5,parameter_6,parameter_7,parameter_8,parameter_9,parameter_10,parameter_11,parameter_12
-2,2,2,1000,1000,1000,1,1,1,5,5,5
+$n_tet$,$n_lac$,$n_lam$,$\alpha_tet$,$\alpha_lac$,$\alpha_lam$,$\alpha_0_tet$,$\alpha_0_lac$,$\alpha_0_lam$,$\beta_tet$,$\beta_lac$,$\beta_lam$
+6160189400.0,51.007423,8377253000.0,1450919.1,9082642000.0,493959200.0,902782200.0,0.0002598028,92675520.0,687481600.0,2.0490463e-11,1393998800.0
