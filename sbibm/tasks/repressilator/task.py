@@ -105,7 +105,7 @@ class Repressilator(Task):
         self.saveat = saveat
 
     @lazy_property
-    def de(self):
+    #def de(self):
  #       return DiffEq(
   #          f=f"""
    #         function f(du,u,p,t)
