@@ -7,7 +7,11 @@ from typing import Callable, List, Optional
 
 import pyro
 import torch
-from diffeqtorch import DiffEq
+#from diffeqtorch import DiffEq
+import scipy #
+import numpy as np #
+from scipy.integrate import odeint #
+
 from pyro import distributions as pdist
 from pyro.distributions.transforms import PowerTransform
 
