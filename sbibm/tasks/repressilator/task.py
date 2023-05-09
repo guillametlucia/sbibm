@@ -106,22 +106,34 @@ class Repressilator(Task):
 
     @lazy_property
     def de(self):
-        return DiffEq(
-            f=f"""
-            function f(du,u,p,t)
-                m_tet,p_tet,m_lac,p_lac,m_lam,p_lam = u
-                n_tet, n_lac, n_lam,a_tet,a_lac,a_lam,a_0_tet,a_0_lac,a_0_lam,b_tet,b_lac,b_lam = p
-                du[1] = -m_tet + (a_tet / (1 + p_lac ** n_lac)) + a_0_tet
-                du[2] = -b_tet*(p_tet-m_tet)
-                du[3] = -m_lac + (a_lac / (1 + p_lam ** n_lam)) + a_0_lac
-                du[4] = -b_lac*(p_lac-m_lac)
-                du[5] = -m_lam + (a_lam / (1 + p_tet ** n_tet)) + a_0_lam
-                du[6] = -b_lam*(p_lam-m_lam)
-            end
-            """,
-            saveat=self.saveat,
-            debug=False,  # 5
-        )
+ #       return DiffEq(
+  #          f=f"""
+   #         function f(du,u,p,t)
+    #            m_tet,p_tet,m_lac,p_lac,m_lam,p_lam = u
+     #           n_tet, n_lac, n_lam,a_tet,a_lac,a_lam,a_0_tet,a_0_lac,a_0_lam,b_tet,b_lac,b_lam = p
+      #          du[1] = -m_tet + (a_tet / (1 + p_lac ** n_lac)) + a_0_tet
+       #         du[2] = -b_tet*(p_tet-m_tet)
+        #        du[3] = -m_lac + (a_lac / (1 + p_lam ** n_lam)) + a_0_lac
+         #       du[4] = -b_lac*(p_lac-m_lac)
+          #      du[5] = -m_lam + (a_lam / (1 + p_tet ** n_tet)) + a_0_lam
+           #     du[6] = -b_lam*(p_lam-m_lam)
+            #end
+            #""",
+            #saveat=self.saveat,
+            #debug=False,  # 5
+        #)
+    def de(u, t, p):
+        m_tet, p_tet, m_lac, p_lac, m_lam, p_lam = u
+        n_tet, n_lac, n_lam, a_tet, a_lac, a_lam, a_0_tet, a_0_lac, a_0_lam, b_tet, b_lac, b_lam = p
+
+        du = np.zeros_like(u)
+        du[0] = -m_tet + (a_tet / (1 + p_lac ** n_lac)) + a_0_tet
+        du[1] = -b_tet*(p_tet-m_tet)
+        du[2] = -m_lac + (a_lac / (1 + p_lam ** n_lam)) + a_0_lac
+        du[3] = -b_lac*(p_lac-m_lac)
+        du[4] = -m_lam + (a_lam / (1 + p_tet ** n_tet)) + a_0_lam
+        du[5] = -b_lam*(p_lam-m_lam)
+        return du
 
     def get_labels_parameters(self) -> List[str]:
         """Get list containing parameter labels"""
@@ -154,7 +166,8 @@ class Repressilator(Task):
 
             us = []
             for num_sample in range(num_samples):
-                u, t = self.de(self.u0, self.tspan, parameters[num_sample, :])
+                u_array = odeint(de, self.u0.np(), self.tspan.np(), args=(parameters[num_sample, :],))
+                u = torch.from_numpy(u_array) #u, t = self.de(self.u0, self.tspan, parameters[num_sample, :])
 
                 if u.shape != torch.Size([6, int(self.dim_data_raw / 6)]):  
                     u = float("nan") * torch.ones((6, int(self.dim_data_raw / 6)))
