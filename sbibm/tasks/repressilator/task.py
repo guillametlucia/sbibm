@@ -199,7 +199,7 @@ class Repressilator(Task):
                 if len(idx_contains_nan) == num_samples:
                     return data
 
-                us = us[:, 1, ::17].reshape(num_samples, -1)  # Only use I population
+                us = us[:, , ::17].reshape(num_samples, -1)  #maybe chage the 17
                 data[idx_contains_no_nan, :] = pyro.sample(
                     "data",
                     pdist.Binomial(
