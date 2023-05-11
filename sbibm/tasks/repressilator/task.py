@@ -26,7 +26,6 @@ class Repressilator(Task):
         self,
         days: float = 20.0, 
         saveat: float = 0.1, 
-        total_count: int = 1000,
         summary: Optional[str] = "subsample",
     ):
         """Repressilator synthetic genetic circuit
@@ -54,7 +53,6 @@ class Repressilator(Task):
         else:
             raise NotImplementedError
         self.summary = summary
-        self.total_count = total_count
 
         # Observation seeds to use when generating ground truth
         observation_seeds = [
@@ -199,16 +197,15 @@ class Repressilator(Task):
                 if len(idx_contains_nan) == num_samples:
                     return data
 
-                us = us[:, , ::17].reshape(num_samples, -1)  #maybe chage the 17
+                us = us[:, :, ::17].reshape(num_samples, -1)  #maybe chage the 17
                 data[idx_contains_no_nan, :] = pyro.sample(
                     "data",
-                    pdist.Binomial(
-                        total_count=self.total_count,
-                        probs=(us[idx_contains_no_nan, :] / self.N).clamp(0.0, 1.0),
+                    pdist.LogNormal(
+                        loc=torch.log(us[idx_contains_no_nan, :].clamp(1e-10, 10000.0)), #mean is the mean of every 17th element in that row. clamp restricts the values: no lower than 1e-10, no higher than 10000
+                        scale=0.1,
                     ).to_event(1),
                 )
                 return data
-
             else:
                 raise NotImplementedError
 
