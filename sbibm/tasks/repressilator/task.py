@@ -1,6 +1,5 @@
 from __future__ import annotations 
 
-import gc 
 import math
 from pathlib import Path
 from typing import Callable, List, Optional
@@ -49,7 +48,7 @@ class Repressilator(Task):
         if summary is None:
             dim_data = self.dim_data_raw
         elif summary == "subsample":
-            dim_data = 10 #need to change
+            dim_data = 10 #need to change. SHOULD I DELETE ENTIRELY??
         else:
             raise NotImplementedError
         self.summary = summary
