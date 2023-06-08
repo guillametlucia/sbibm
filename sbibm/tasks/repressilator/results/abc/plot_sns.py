@@ -1,3 +1,4 @@
+#%%
 import seaborn as sns
 import numpy as np
 import pandas as pd
@@ -28,3 +29,10 @@ def posterior_plot(data:str):
     plt.show()
 
 posterior_plot('df_posterior_2_1000_smc_abc.csv')
+
+
+#from sbibm.visualisation import fig_posterior
+#fig = fig_posterior(task_name="repressilator", observation=1, samples=[posterior_samples])  
+#fig.show()
+#Note: Use fig.show() or fig.save() to show or save the figure
+# %%
